@@ -17,9 +17,9 @@ static const test_function test_functions[] =
 {
       LTC_TEST_FN(store_test),
       LTC_TEST_FN(rotate_test),
+      LTC_TEST_FN(cipher_hash_test),
       LTC_TEST_FN(misc_test),
       LTC_TEST_FN(mpi_test),
-      LTC_TEST_FN(cipher_hash_test),
       LTC_TEST_FN(mac_test),
       LTC_TEST_FN(modes_test),
       LTC_TEST_FN(der_test),
@@ -37,6 +37,7 @@ static const test_function test_functions[] =
       LTC_TEST_FN(file_test),
       LTC_TEST_FN(multi_test),
       LTC_TEST_FN(pem_test),
+      LTC_TEST_FN(deprecated_test),
       /* keep the prng_test always at the end as
        * it has to be handled specially when
        * testing with LTC_PTHREAD enabled
@@ -356,7 +357,7 @@ int main(int argc, char **argv)
    }
 
 #ifdef LTC_PTHREAD
-   tinfo = XCALLOC(sizeof(test_functions)/sizeof(test_functions[0]), sizeof(thread_info));
+   tinfo = XCALLOC(LTC_ARRAY_SIZE(test_functions), sizeof(thread_info));
    if (tinfo == NULL) {
       printf("\n\nFAILURE: XCALLOC\n");
       return EXIT_FAILURE;
@@ -385,7 +386,7 @@ int main(int argc, char **argv)
    if (argc > 1) single_test = argv[1];
 
    dur = epoch_usec();
-   for (i = 0; i < sizeof(test_functions)/sizeof(test_functions[0]); ++i) {
+   for (i = 0; i < LTC_ARRAY_SIZE(test_functions); ++i) {
       if (single_test && strstr(test_functions[i].name, single_test) == NULL) {
         continue;
       }

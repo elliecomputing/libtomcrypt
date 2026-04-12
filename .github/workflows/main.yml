@@ -5,12 +5,16 @@ on:
     branches:
       - master
       - develop
-      - /^release\/.*$/
+      - 'release/**'
+      - 'support/**'
+      - 'ci/**'
   pull_request:
     branches:
       - master
       - develop
-      - /^release\/.*$/
+      - 'release/**'
+      - 'support/**'
+      - 'ci/**'
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
@@ -42,13 +46,15 @@ jobs:
           - { BUILDNAME: 'VALGRIND',                BUILDOPTIONS: '',                                                                     BUILDSCRIPT: '.ci/valgrind.sh' }
           - { BUILDNAME: 'STOCK',                   BUILDOPTIONS: '',                                                                     BUILDSCRIPT: '.ci/run.sh' }
           - { BUILDNAME: 'STOCK-MPI',               BUILDOPTIONS: '-ULTM_DESC -UTFM_DESC -UUSE_LTM -UUSE_TFM',                            BUILDSCRIPT: '.ci/run.sh' }
-          - { BUILDNAME: 'STOCK+AESNI',             BUILDOPTIONS: '-DLTC_AES_NI',                                                         BUILDSCRIPT: '.ci/run.sh' }
           - { BUILDNAME: 'EASY',                    BUILDOPTIONS: '-DLTC_EASY',                                                           BUILDSCRIPT: '.ci/run.sh' }
-          - { BUILDNAME: 'SMALL',                   BUILDOPTIONS: '-DLTC_SMALL_CODE',                                                     BUILDSCRIPT: '.ci/run.sh' }
+          - { BUILDNAME: 'SMALL_CODE',              BUILDOPTIONS: '-DLTC_SMALL_CODE',                                                     BUILDSCRIPT: '.ci/run.sh' }
+          - { BUILDNAME: 'SMALL_STACK',             BUILDOPTIONS: '-DLTC_SMALL_STACK',                                                    BUILDSCRIPT: '.ci/run.sh' }
+          - { BUILDNAME: 'SMALL',                   BUILDOPTIONS: '-DLTC_SMALL_CODE -DLTC_SMALL_STACK',                                   BUILDSCRIPT: '.ci/run.sh' }
           - { BUILDNAME: 'NO_TABLES',               BUILDOPTIONS: '-DLTC_NO_TABLES',                                                      BUILDSCRIPT: '.ci/run.sh' }
           - { BUILDNAME: 'NO_FAST',                 BUILDOPTIONS: '-DLTC_NO_FAST',                                                        BUILDSCRIPT: '.ci/run.sh' }
-          - { BUILDNAME: 'NO_FAST+SMALL+NO_TABLES', BUILDOPTIONS: '-DLTC_NO_FAST -DLTC_SMALL_CODE -DLTC_NO_TABLES',                       BUILDSCRIPT: '.ci/run.sh' }
+          - { BUILDNAME: 'NO_FAST+SMALL+NO_TABLES', BUILDOPTIONS: '-DLTC_NO_FAST -DLTC_SMALL_CODE -DLTC_SMALL_STACK -DLTC_NO_TABLES',     BUILDSCRIPT: '.ci/run.sh' }
           - { BUILDNAME: 'NO_ASM',                  BUILDOPTIONS: '-DLTC_NO_ASM',                                                         BUILDSCRIPT: '.ci/run.sh' }
+          - { BUILDNAME: 'NO_DEPRECATED_APIS',      BUILDOPTIONS: '-DLTC_NO_DEPRECATED_APIS',                                             BUILDSCRIPT: '.ci/run.sh' }
           - { BUILDNAME: 'NO_TIMING_RESISTANCE',    BUILDOPTIONS: '-DLTC_NO_ECC_TIMING_RESISTANT -DLTC_NO_RSA_BLINDING',                  BUILDSCRIPT: '.ci/run.sh' }
           - { BUILDNAME: 'FORTUNA_CUSTOM_OPTIONS',  BUILDOPTIONS: '-DLTC_FORTUNA_USE_ENCRYPT_ONLY -DLTC_FORTUNA_RESEED_RATELIMIT_STATIC', BUILDSCRIPT: '.ci/run.sh' }
           - { BUILDNAME: 'PTHREAD',                 BUILDOPTIONS: '-DLTC_PTHREAD',                                                        BUILDSCRIPT: '.ci/run.sh' }
@@ -59,11 +65,10 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - name: install dependencies
-        uses: nick-fields/retry@v3
+        uses: nick-fields/retry@v4.0.0
         with:
-          timeout_minutes: 5
+          timeout_minutes: 20
           max_attempts: 3
-          retry_on: error
           command: |
             sudo apt-get update -qq
             sudo apt-get install -y libgmp-dev valgrind libtool-bin clang-tools lcov ruby clang
@@ -113,11 +118,10 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - name: install dependencies
-        uses: nick-fields/retry@v3
+        uses: nick-fields/retry@v4.0.0
         with:
-          timeout_minutes: 5
+          timeout_minutes: 20
           max_attempts: 3
-          retry_on: error
           command: |
             sudo apt-get update -qq
             sudo apt-get remove -y libtommath1
@@ -129,3 +133,47 @@ jobs:
         run: |
           make pre_gen
           make CFLAGS="-DLTM_DESC -DUSE_LTM" EXTRALIBS="-ltommath" AMALGAM=1 -j$(nproc) check
+
+  CMake:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ ubuntu-22.04, ubuntu-24.04, ubuntu-22.04-arm, ubuntu-24.04-arm ]
+        build_type: [ '', -DCMAKE_BUILD_TYPE=Debug, -DCMAKE_BUILD_TYPE=Release, -DCMAKE_BUILD_TYPE=RelWithDebInfo, -DCMAKE_BUILD_TYPE=MinSizeRel ]
+        cc: [ clang, gcc ]
+        cflags: [ '', '-DLTC_CFLAGS="-DLTC_NO_ASM"']
+        config:
+          # Static library build
+          - { CMAKEOPTIONS: '-DBUILD_SHARED_LIBS=Off' }
+          # Shared library build
+          - { CMAKEOPTIONS: '-DBUILD_SHARED_LIBS=On'  }
+    steps:
+      - uses: actions/checkout@v4
+      - name: install dependencies
+        uses: nick-fields/retry@v4.0.0
+        with:
+          timeout_minutes: 20
+          max_attempts: 3
+          command: |
+            sudo apt-get update -qq
+            sudo apt-get remove -y libtommath1
+            curl -s https://packagecloud.io/install/repositories/libtom/packages/script.deb.sh | sudo bash
+            sudo apt-get install libtommath-git-dev
+            sudo apt-get install -y cmake gcc clang llvm
+      - name: build
+        run: |
+          mkdir build
+          cd build
+          CC=${{ matrix.cc }} cmake ${{ matrix.config.CMAKEOPTIONS }} ${{ matrix.build_type }} ${{ matrix.cflags }} ..
+          make -j$(nproc)
+      - name: test
+        run: |
+          cd build
+          CC=${{ matrix.cc }} cmake ${{ matrix.config.CMAKEOPTIONS }} ${{ matrix.build_type }} ${{ matrix.cflags }} -DBUILD_TESTING=On ..
+          make -j$(nproc)
+          ctest
+      - name: error logs
+        if: ${{ failure() }}
+        run: |
+          cat build/Testing/Temporary/LastTest.log || true
+          cat demo/build/Testing/Temporary/LastTest.log || true

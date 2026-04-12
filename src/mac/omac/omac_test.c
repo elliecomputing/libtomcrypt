@@ -76,13 +76,13 @@ int omac_test(void)
        }
     }
 
-    for (x = 0; x < (int)(sizeof(tests)/sizeof(tests[0])); x++) {
+    for (x = 0; x < (int)LTC_ARRAY_SIZE(tests); x++) {
        len = sizeof(out);
        if ((err = omac_memory(idx, tests[x].key, tests[x].keylen, tests[x].msg, tests[x].msglen, out, &len)) != CRYPT_OK) {
           return err;
        }
 
-       if (compare_testvector(out, len, tests[x].tag, sizeof(tests[x].tag), "OMAC", x) != 0) {
+       if (ltc_compare_testvector(out, len, tests[x].tag, sizeof(tests[x].tag), "OMAC", x) != 0) {
           return CRYPT_FAIL_TESTVECTOR;
        }
     }

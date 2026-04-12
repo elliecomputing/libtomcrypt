@@ -55,16 +55,6 @@ void print_hex(const char* what, const void* v, const unsigned long l)
   }
 }
 
-int do_compare_testvector(const void* is, const unsigned long is_len, const void* should, const unsigned long should_len, const char* what, int which)
-{
-   if (compare_testvector(is, is_len, should, should_len, what, which) == 0) {
-      return CRYPT_OK;
-   } else {
-      return CRYPT_FAIL_TESTVECTOR;
-   }
-}
-
-
 #ifdef LTC_TEST_READDIR
 
 #include <sys/stat.h>
@@ -103,7 +93,10 @@ static DIR *s_opendir(const char *path, char *mypath, unsigned long l)
 static int s_read_and_process(FILE *f, unsigned long sz, void *ctx, dir_iter_cb process)
 {
    int err = CRYPT_OK;
-   void* buf = XMALLOC(sz + 1);
+   void* buf;
+   if (f == NULL)
+      return CRYPT_FILE_NOTFOUND;
+   buf = XMALLOC(sz + 1);
    if (buf == NULL)
       return CRYPT_MEM;
    if (fread(buf, 1, sz, f) != sz) {
@@ -177,7 +170,7 @@ int test_process_dir(const char *path, void *ctx, dir_iter_cb iter, dir_fiter_cb
       }
 
 continue_loop:
-      fclose(f);
+      if (f != NULL) fclose(f);
       f = NULL;
    }
    if (f != NULL) fclose(f);

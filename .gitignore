@@ -1,11 +1,13 @@
 # suppress compiler/linker output
 *.[oa]
 *.obj
-*.l[oa]
+*.dylib*
+*.dll*
+*.so*
 [Dd]ebug/
 [Rr]elease/
 /MSVC_*
-.libs/
+.bin/
 
 # release files
 /libtomcrypt-*
@@ -30,6 +32,8 @@ constants
 constants.exe
 crypt
 crypt.exe
+der_print_flexi
+der_print_flexi.exe
 hashsum
 hashsum.exe
 multi
@@ -38,8 +42,8 @@ openssl-enc
 openssl-enc.exe
 openssh-privkey
 openssh-privkey.exe
-pem-info
-pem-info.exe
+latex-tables
+latex-tables.exe
 sizes
 sizes.exe
 small
@@ -105,7 +109,7 @@ doxygen/
 *.lof
 *.bak
 
-coverage/
+coverage*/
 coverage*.info
 
 # coverity intermediate directory etc.

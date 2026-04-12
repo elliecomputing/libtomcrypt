@@ -88,125 +88,29 @@ const char ltc_der_tests_cacert_root_cert[] =
    "omTxJBzcoTWcFbLUvFUufQb1nA5V9FrWk9p2rSVzTMVD";
 const unsigned long ltc_der_tests_cacert_root_cert_size = sizeof(ltc_der_tests_cacert_root_cert);
 
-/*
-SEQUENCE(3 elem)
-    SEQUENCE(8 elem)
-        [0](1)
-            INTEGER  2
-        INTEGER  0
-        SEQUENCE(2 elem)
-            OBJECT IDENTIFIER 1.2.840.113549.1.1.4
-            NULL
-        SEQUENCE(4 elem)
-            SET(1 elem)
-                SEQUENCE(2 elem)
-                    OBJECT IDENTIFIER 2.5.4.10
-                    PrintableString  Root CA
-            SET(1 elem)
-                SEQUENCE(2 elem)
-                    OBJECT IDENTIFIER 2.5.4.11
-                    PrintableString  http://www.cacert.org
-            SET(1 elem)
-                SEQUENCE(2 elem)
-                    OBJECT IDENTIFIER 2.5.4.3
-                    PrintableString  CA Cert Signing Authority
-            SET(1 elem)
-                SEQUENCE(2 elem)
-                    OBJECT IDENTIFIER 1.2.840.113549.1.9.1
-                    IA5String support@cacert.org
-        SEQUENCE(2 elem)
-            UTCTime03-03-30 12:29:49 UTC
-            UTCTime33-03-29 12:29:49 UTC
-        SEQUENCE(4 elem)
-            SET(1 elem)
-                SEQUENCE(2 elem)
-                    OBJECT IDENTIFIER 2.5.4.10
-                    PrintableString Root CA
-            SET(1 elem)
-                SEQUENCE(2 elem)
-                    OBJECT IDENTIFIER 2.5.4.11
-                    PrintableString http://www.cacert.org
-            SET(1 elem)
-                SEQUENCE(2 elem)
-                    OBJECT IDENTIFIER 2.5.4.3
-                    PrintableString CA Cert Signing Authority
-            SET(1 elem)
-                SEQUENCE(2 elem)
-                    OBJECT IDENTIFIER 1.2.840.113549.1.9.1
-                    IA5String support@cacert.org
-        SEQUENCE(2 elem)
-            SEQUENCE(2 elem)
-                OBJECT IDENTIFIER 1.2.840.113549.1.1.1
-                NULL
-            BIT STRING(1 elem)
-        SEQUENCE(2 elem)
-            INTEGER (4096 bit)
-            INTEGER 65537
-        [3](1)
-            SEQUENCE(7 elem)
-                SEQUENCE(2 elem)
-                    OBJECT IDENTIFIER 2.5.29.14
-                    OCTET STRING(1 elem)
-                        OCTET STRING(20 byte) 16B5321BD4C7F3E0E68EF3BDD2B03AEEB23918D1
-                SEQUENCE(2 elem)
-                    OBJECT IDENTIFIER 2.5.29.35
-                    OCTET STRING(1 elem)
-                        SEQUENCE(3 elem)
-                            [0]
-                            [1](1)
-                                [4](1)
-                                SEQUENCE(4 elem)
-                                    SET(1 elem)
-                                        SEQUENCE(2 elem)
-                                            OBJECT IDENTIFIER 2.5.4.10
-                                            PrintableString Root CA
-                                    SET(1 elem)
-                                        SEQUENCE(2 elem)
-                                            OBJECT IDENTIFIER 2.5.4.11
-                                            PrintableString http://www.cacert.org
-                                    SET(1 elem)
-                                        SEQUENCE(2 elem)
-                                            OBJECT IDENTIFIER 2.5.4.3
-                                            PrintableString CA Cert Signing Authority
-                                    SET(1 elem)
-                                        SEQUENCE(2 elem)
-                                            OBJECT IDENTIFIER 1.2.840.113549.1.9.1
-                                            IA5String support@cacert.org
-                            [2]
-                SEQUENCE(3 elem)
-                    OBJECT IDENTIFIER 2.5.29.19
-                    BOOLEAN true
-                    OCTET STRING(1 elem)
-                        SEQUENCE(1 elem)
-                            BOOLEAN true
-                SEQUENCE(2 elem)
-                    OBJECT IDENTIFIER 2.5.29.31
-                    OCTET STRING(1 elem)
-                        SEQUENCE(1 elem)
-                            SEQUENCE(1 elem)
-                                [0](1)
-                                    [0](1)
-                                        [6]
-                SEQUENCE(2 elem)
-                    OBJECT IDENTIFIER 2.16.840.1.113730.1.4
-                    OCTET STRING(1 elem)
-                        IA5String https://www.cacert.org/revoke.crl
-                SEQUENCE(2 elem)
-                    OBJECT IDENTIFIER 2.16.840.1.113730.1.8
-                    OCTET STRING(1 elem)
-                        IA5String http://www.cacert.org/index.php?id=10
-                SEQUENCE(2 elem)
-                    OBJECT IDENTIFIER 2.16.840.1.113730.1.13
-                    OCTET STRING(1 elem)
-                        IA5String To get your own certificate for FREE head over to http://www.cacert.org
-    SEQUENCE(2 elem)
-        OBJECT IDENTIFIER 1.2.840.113549.1.1.4
-        NULL
-    BIT STRING(4096 bit)
- */
+#ifdef LTC_DER_TESTS_PRINT_FLEXI
 
+#define LTC_DER_PRINT_FLEXI_NO_MAIN
+#include "../demos/der_print_flexi.c"
+
+static void s_der_tests_print_flexi(ltc_asn1_list* l)
+{
+   fprintf(stderr, "\n\n");
+   s_der_print_flexi_i(l, 0);
+   fprintf(stderr, "\n\n");
+}
+
+#else
+static void s_der_tests_print_flexi(ltc_asn1_list* l)
+{
+   LTC_UNUSED_PARAM(l);
+}
+#endif
+
+#ifndef ASN1_FMTSTRING_FMT
 #define ASN1_FMTSTRING_FMT "line: %d, type=%d, size=%lu, data=%p, self=%p, next=%p, prev=%p, parent=%p, child=%p"
 #define ASN1_FMTSTRING_VAL(l)  __LINE__, (l)->type, (l)->size, (l)->data, (l), (l)->next, (l)->prev, (l)->parent, (l)->child
+#endif
 
 #define ASN1_ERR(l) fprintf(stderr, ASN1_FMTSTRING_FMT "\n", ASN1_FMTSTRING_VAL(l)); \
     exit(EXIT_FAILURE)
@@ -229,238 +133,6 @@ SEQUENCE(3 elem)
 #define CHECK_ASN1_HAS_NO_NEXT(l) CHECK_ASN1_HAS_NO(l, next)
 #define CHECK_ASN1_HAS_DATA(l) CHECK_ASN1_HAS(l, data)
 #define CHECK_ASN1_HAS_NO_DATA(l) CHECK_ASN1_HAS_NO(l, data)
-
-#ifdef LTC_DER_TESTS_PRINT_FLEXI
-
-static void* s_xmalloc(int l)
-{
-   void *r = XMALLOC(l);
-
-#if defined(LTC_TEST_DBG) && LTC_TEST_DBG > 3
-   fprintf(stderr, "ALLOC %9d to %p\n", l, r);
-#endif
-   if (!r) {
-      fprintf(stderr, "Could not allocate %d bytes of memory\n", l);
-      exit(EXIT_FAILURE);
-   }
-   return r;
-}
-
-static void s_free(void *p)
-{
-#if defined(LTC_TEST_DBG) && LTC_TEST_DBG > 3
-   fprintf(stderr, "FREE %p\n", p);
-#endif
-   XFREE(p);
-}
-
-static void s_der_tests_print_flexi_i(ltc_asn1_list* l, unsigned int level)
-{
-  char *buf = NULL;
-  const char* name = NULL;
-  const char* text = NULL;
-  ltc_asn1_list* ostring = NULL;
-  unsigned int n;
-  int slen;
-
-  switch (l->type)
-    {
-  case LTC_ASN1_EOL:
-    name = "EOL";
-    slen = snprintf(NULL, 0, ASN1_FMTSTRING_FMT "\n", ASN1_FMTSTRING_VAL(l));
-    buf = s_xmalloc(slen);
-    slen = snprintf(buf, slen, ASN1_FMTSTRING_FMT "\n", ASN1_FMTSTRING_VAL(l));
-    text = buf;
-    break;
-  case LTC_ASN1_BOOLEAN:
-    name = "BOOLEAN";
-    {
-      if (*(int*)l->data)
-        text = "true";
-      else
-        text = "false";
-    }
-    break;
-  case LTC_ASN1_INTEGER:
-    name = "INTEGER";
-    buf = s_xmalloc(((ltc_mp_get_digit_count(l->data) + 1) * ltc_mp.bits_per_digit) / 3);
-    ltc_mp_toradix(l->data, buf, 10);
-    text = buf;
-    break;
-  case LTC_ASN1_SHORT_INTEGER:
-    name = "SHORT INTEGER";
-    break;
-  case LTC_ASN1_BIT_STRING:
-    name = "BIT STRING";
-    break;
-  case LTC_ASN1_OCTET_STRING:
-    name = "OCTET STRING";
-    {
-      unsigned long ostring_l = l->size;
-      /* sometimes there's another sequence in an octet string...
-       * try to decode that... if it fails print out the octet string
-       */
-      if (der_decode_sequence_flexi(l->data, &ostring_l, &ostring) == CRYPT_OK) {
-          text = "";
-      } else {
-          int r;
-          int sz = l->size * 2 + 1;
-          char* s = buf = s_xmalloc(sz);
-          for (n = 0; n < l->size; ++n) {
-              r = snprintf(s, sz, "%02X", ((unsigned char*)l->data)[n]);
-              if (r < 0 || r >= sz) {
-                  fprintf(stderr, "%s boom\n", name);
-                  exit(EXIT_FAILURE);
-              }
-              s += r;
-              sz -= r;
-          }
-          text = buf;
-      }
-    }
-    break;
-  case LTC_ASN1_NULL:
-    name = "NULL";
-    text = "";
-    break;
-  case LTC_ASN1_OBJECT_IDENTIFIER:
-    name = "OBJECT IDENTIFIER";
-    {
-      unsigned long len = 0;
-      if (pk_oid_num_to_str(l->data, l->size, buf, &len) != CRYPT_BUFFER_OVERFLOW) {
-        fprintf(stderr, "%s WTF\n", name);
-        exit(EXIT_FAILURE);
-      }
-      buf = s_xmalloc(len);
-      if (pk_oid_num_to_str(l->data, l->size, buf, &len) != CRYPT_OK) {
-        fprintf(stderr, "%s boom\n", name);
-        exit(EXIT_FAILURE);
-      }
-      text = buf;
-    }
-    break;
-  case LTC_ASN1_IA5_STRING:
-    name = "IA5 STRING";
-    text = l->data;
-    break;
-  case LTC_ASN1_PRINTABLE_STRING:
-    name = "PRINTABLE STRING";
-    text = l->data;
-    break;
-  case LTC_ASN1_UTF8_STRING:
-    name = "UTF8 STRING";
-    break;
-  case LTC_ASN1_UTCTIME:
-    name = "UTCTIME";
-    {
-      ltc_utctime* ut = l->data;
-      slen = 32;
-      buf = s_xmalloc(slen);
-      snprintf(buf, slen, "%02d-%02d-%02d %02d:%02d:%02d %c%02d:%02d",
-          ut->YY, ut->MM, ut->DD, ut->hh, ut->mm, ut->ss,
-          ut->off_dir ? '-' : '+', ut->off_hh, ut->off_mm);
-      text = buf;
-    }
-    break;
-  case LTC_ASN1_GENERALIZEDTIME:
-    name = "GENERALIZED TIME";
-    {
-      ltc_generalizedtime* gt = l->data;
-      slen = 32;
-      buf = s_xmalloc(slen);
-      if(gt->fs)
-         snprintf(buf, slen, "%04d-%02d-%02d %02d:%02d:%02d.%02dZ",
-          gt->YYYY, gt->MM, gt->DD, gt->hh, gt->mm, gt->ss, gt->fs);
-      else
-         snprintf(buf, slen, "%04d-%02d-%02d %02d:%02d:%02dZ",
-          gt->YYYY, gt->MM, gt->DD, gt->hh, gt->mm, gt->ss);
-      text = buf;
-    }
-    break;
-  case LTC_ASN1_CHOICE:
-    name = "CHOICE";
-    break;
-  case LTC_ASN1_SEQUENCE:
-    name = "SEQUENCE";
-    text = "";
-    break;
-  case LTC_ASN1_SET:
-    name = "SET";
-    text = "";
-    break;
-  case LTC_ASN1_SETOF:
-    name = "SETOF";
-    text = "";
-    break;
-  case LTC_ASN1_RAW_BIT_STRING:
-    name = "RAW BIT STRING";
-    break;
-  case LTC_ASN1_TELETEX_STRING:
-    name = "TELETEX STRING";
-    text = l->data;
-    break;
-  case LTC_ASN1_CUSTOM_TYPE:
-    name = "NON STANDARD";
-    {
-       int r;
-       int sz = 128;
-       char* s = buf = s_xmalloc(sz);
-
-       r = snprintf(s, sz, "[%s %s %llu]", der_asn1_class_to_string_map[l->klass], der_asn1_pc_to_string_map[l->pc], l->tag);
-       if (r < 0 || r >= sz) {
-           fprintf(stderr, "%s boom\n", name);
-           exit(EXIT_FAILURE);
-       }
-       s += r;
-       sz -= r;
-
-       text = buf;
-    }
-    break;
-  }
-
-  for (n = 0; n < level; ++n) {
-     fprintf(stderr, "    ");
-  }
-  if (name) {
-      if (text)
-         fprintf(stderr, "%s %s\n", name, text);
-      else
-         fprintf(stderr, "%s <missing decoding>\n", name);
-  }
-  else
-     fprintf(stderr, "WTF type=%i\n", l->type);
-
-  if (buf) {
-     s_free(buf);
-     buf = NULL;
-  }
-
-  if (ostring) {
-      s_der_tests_print_flexi_i(ostring, level + 1);
-      der_free_sequence_flexi(ostring);
-  }
-
-  if (l->child)
-    s_der_tests_print_flexi_i(l->child, level + 1);
-
-  if (l->next)
-    s_der_tests_print_flexi_i(l->next, level);
-}
-
-static void s_der_tests_print_flexi(ltc_asn1_list* l)
-{
-   fprintf(stderr, "\n\n");
-   s_der_tests_print_flexi_i(l, 0);
-   fprintf(stderr, "\n\n");
-}
-
-#else
-static void s_der_tests_print_flexi(ltc_asn1_list* l)
-{
-   LTC_UNUSED_PARAM(l);
-}
-#endif
 
 static void der_cacert_test(void)
 {
@@ -691,6 +363,33 @@ static void der_set_test(void)
 
 }
 
+static void s_der_oid_test(void)
+{
+   static const unsigned char oid_x690_8_19_5_example[] = { 0x06, 0x03, 0x88, 0x37, 0x03 };
+   unsigned long len, oid[3];
+   unsigned char buf[64];
+
+   ltc_asn1_list *decoded_list, static_list[1];
+
+   len = sizeof(oid_x690_8_19_5_example);
+   DO(der_decode_sequence_flexi(oid_x690_8_19_5_example, &len, &decoded_list));
+
+   LTC_SET_ASN1(static_list, 0, LTC_ASN1_OBJECT_IDENTIFIER, (void *)decoded_list->data, decoded_list->size);
+   len = sizeof(buf);
+   DO(der_encode_object_identifier(decoded_list->data, decoded_list->size, buf, &len));
+   der_sequence_free(decoded_list);
+
+   COMPARE_TESTVECTOR(buf, len, oid_x690_8_19_5_example, sizeof(oid_x690_8_19_5_example), "OID X6.90 Ch. 8.19.5 Example", 0);
+
+   oid[0] = 3;
+   oid[1] = 4;
+   oid[2] = 5;
+
+   len = sizeof(buf);
+   SHOULD_FAIL(der_encode_object_identifier(oid, 3, buf, &len));
+   len = sizeof(buf);
+   SHOULD_FAIL(der_length_object_identifier(oid, 3, &len));
+}
 
 /* we are encoding
 
@@ -716,35 +415,6 @@ static void der_set_test(void)
   }
 
 */
-
-static void s_der_oid_test(void)
-{
-   static const unsigned char oid_x690_8_19_5_example[] = { 0x06, 0x03, 0x88, 0x37, 0x03 };
-   unsigned long len, oid[3];
-   unsigned char buf[64];
-
-   ltc_asn1_list *decoded_list, static_list[1];
-
-   len = sizeof(oid_x690_8_19_5_example);
-   DO(der_decode_sequence_flexi(oid_x690_8_19_5_example, &len, &decoded_list));
-
-   LTC_SET_ASN1(static_list, 0, LTC_ASN1_OBJECT_IDENTIFIER, (void *)decoded_list->data, decoded_list->size);
-   len = sizeof(buf);
-   DO(der_encode_object_identifier(decoded_list->data, decoded_list->size, buf, &len));
-   der_sequence_free(decoded_list);
-
-   DO(do_compare_testvector(buf, len, oid_x690_8_19_5_example, sizeof(oid_x690_8_19_5_example), "OID X6.90 Ch. 8.19.5 Example", 0));
-
-   oid[0] = 3;
-   oid[1] = 4;
-   oid[2] = 5;
-
-   len = sizeof(buf);
-   SHOULD_FAIL(der_encode_object_identifier(oid, 3, buf, &len));
-   len = sizeof(buf);
-   SHOULD_FAIL(der_length_object_identifier(oid, 3, &len));
-}
-
 static void der_flexi_test(void)
 {
    static const char printable_str[]    = "printable";
@@ -1014,7 +684,7 @@ static void der_flexi_test(void)
          exit(EXIT_FAILURE);
       }
 
-      if (l->size != sizeof(oid_str)/sizeof(oid_str[0]) || memcmp(oid_str, l->data, l->size*sizeof(oid_str[0]))) {
+      if (l->size != LTC_ARRAY_SIZE(oid_str) || memcmp(oid_str, l->data, l->size*sizeof(oid_str[0]))) {
          fprintf(stderr, "(%d), %d, %lu, next=%p, prev=%p, parent=%p, child=%p\n", __LINE__, l->type, l->size, l->next, l->prev, l->parent, l->child);
          exit(EXIT_FAILURE);
       }
@@ -1097,13 +767,13 @@ static int der_choice_n_custom_test(void)
    for (x = 0; x < sizeof(octetbuf); x++) { octetbuf[x] = x;     }
    for (x = 0; x < sizeof(ia5buf); x++)   { ia5buf[x]   = 'a';   }
    for (x = 0; x < sizeof(printbuf); x++) { printbuf[x] = 'a';   }
-   for (x = 0; x < sizeof(utf8buf)/sizeof(utf8buf[0]); x++) { utf8buf[x] = L'a';   }
+   for (x = 0; x < LTC_ARRAY_SIZE(utf8buf); x++) { utf8buf[x] = L'a';   }
    integer = 1;
    boolean[0] = 1;
-   for (x = 0; x < sizeof(oidbuf)/sizeof(oidbuf[0]); x++)   { oidbuf[x] = x + 1;   }
+   for (x = 0; x < LTC_ARRAY_SIZE(oidbuf); x++)   { oidbuf[x] = x + 1;   }
    DO(ltc_mp_init(&mpinteger));
 
-   n = sizeof(types)/sizeof(types[0]);
+   n = LTC_ARRAY_SIZE(types);
    for (x = 0; x < n * 2; x++) {
        /* setup list */
        y = 0;
@@ -1115,13 +785,13 @@ static int der_choice_n_custom_test(void)
        }
        LTC_SET_ASN1(types, y++, LTC_ASN1_OCTET_STRING, octetbuf, sizeof(octetbuf));
        LTC_SET_ASN1(types, y++, LTC_ASN1_IA5_STRING, ia5buf, sizeof(ia5buf));
-       LTC_SET_ASN1(types, y++, LTC_ASN1_BOOLEAN, boolean, sizeof(boolean)/sizeof(boolean[0]));
+       LTC_SET_ASN1(types, y++, LTC_ASN1_BOOLEAN, boolean, LTC_ARRAY_SIZE(boolean));
        if (x > n) {
           LTC_SET_ASN1(types, y++, LTC_ASN1_SHORT_INTEGER, &integer, 1);
        } else {
           LTC_SET_ASN1(types, y++, LTC_ASN1_INTEGER, mpinteger, 1);
        }
-       LTC_SET_ASN1(types, y++, LTC_ASN1_OBJECT_IDENTIFIER, oidbuf, sizeof(oidbuf)/sizeof(oidbuf[0]));
+       LTC_SET_ASN1(types, y++, LTC_ASN1_OBJECT_IDENTIFIER, oidbuf, LTC_ARRAY_SIZE(oidbuf));
        if (x > n) {
           LTC_SET_ASN1(types, y++, LTC_ASN1_UTCTIME, &utctime, 1);
        } else {
@@ -1131,7 +801,7 @@ static int der_choice_n_custom_test(void)
        LTC_SET_ASN1(custom, 0, LTC_ASN1_NULL, NULL, 0);
        LTC_SET_ASN1_CUSTOM_CONSTRUCTED(types, y++, LTC_ASN1_CL_CONTEXT_SPECIFIC, 0, custom);
 
-       LTC_SET_ASN1(types, y++, LTC_ASN1_UTF8_STRING, utf8buf, sizeof(utf8buf)/sizeof(utf8buf[0]));
+       LTC_SET_ASN1(types, y++, LTC_ASN1_UTF8_STRING, utf8buf, LTC_ARRAY_SIZE(utf8buf));
 
        LTC_SET_ASN1(host, 0, LTC_ASN1_CHOICE, types, n);
 
@@ -1295,7 +965,7 @@ static void der_Xcode_run(const der_Xcode_t* x)
       d2 = XREALLOC(d2, l2 * x->type_sz);
    }
    DO(x->decode(d1, l1, d2, &l2));
-   DO(do_compare_testvector(d2, (l2/x->factor) * x->type_sz, x->in, x->in_sz, x->what, __LINE__));
+   COMPARE_TESTVECTOR(d2, (l2/x->factor) * x->type_sz, x->in, x->in_sz, x->what, __LINE__);
    XFREE(d2);
    XFREE(d1);
 }
@@ -1344,7 +1014,7 @@ static void der_Xcode_test(void)
     DER_XCODE(utf8_string, wchar_string),
    };
 
-   for (i = 0; i < sizeof(xcode_tests)/sizeof(xcode_tests[0]); ++i) {
+   for (i = 0; i < LTC_ARRAY_SIZE(xcode_tests); ++i) {
       der_Xcode_run(&xcode_tests[i]);
    }
 
@@ -1425,7 +1095,7 @@ static void s_der_regression_test(void)
    SHOULD_FAIL(der_decode_sequence_flexi(issue_507, &len, &l));
 
    len = sizeof(utf8_length);
-   outlen = sizeof(wtmp)/sizeof(wtmp[0]);
+   outlen = LTC_ARRAY_SIZE(wtmp);
    DO(der_decode_utf8_string(utf8_length, len, wtmp, &outlen));
    ENSURE(outlen == 2);
 }
@@ -1544,7 +1214,7 @@ static void der_toolong_test(void)
 
    ltc_mp_deinit_multi(int1, int2, LTC_NULL);
 
-   LTC_SET_ASN1(seqoid,  0, LTC_ASN1_OBJECT_IDENTIFIER, oid, sizeof(oid)/sizeof(oid[0]));
+   LTC_SET_ASN1(seqoid,  0, LTC_ASN1_OBJECT_IDENTIFIER, oid, LTC_ARRAY_SIZE(oid));
    LTC_SET_ASN1(seqoid,  1, LTC_ASN1_NULL,              NULL,   0);
    LTC_SET_ASN1(seqmain, 0, LTC_ASN1_SEQUENCE,          seqoid, 2);
    LTC_SET_ASN1(seqmain, 1, LTC_ASN1_OCTET_STRING,      buf32,  32);
@@ -1805,7 +1475,7 @@ int der_test(void)
 
 /* test OID */
    x = sizeof(buf[0]);
-   DO(der_encode_object_identifier((unsigned long*)rsa_oid, sizeof(rsa_oid)/sizeof(rsa_oid[0]), buf[0], &x));
+   DO(der_encode_object_identifier((unsigned long*)rsa_oid, LTC_ARRAY_SIZE(rsa_oid), buf[0], &x));
    if (x != sizeof(rsa_oid_der) || memcmp(rsa_oid_der, buf[0], x)) {
       fprintf(stderr, "rsa_oid_der encode failed to match, %lu, ", x);
       for (y = 0; y < x; y++) fprintf(stderr, "%02x ", buf[0][y]);
@@ -1813,9 +1483,9 @@ int der_test(void)
       return 1;
    }
 
-   y = sizeof(oid[0])/sizeof(oid[0][0]);
+   y = LTC_ARRAY_SIZE(oid[0]);
    DO(der_decode_object_identifier(buf[0], x, oid[0], &y));
-   if (y != sizeof(rsa_oid)/sizeof(rsa_oid[0]) || memcmp(rsa_oid, oid[0], sizeof(rsa_oid))) {
+   if (y != LTC_ARRAY_SIZE(rsa_oid) || memcmp(rsa_oid, oid[0], sizeof(rsa_oid))) {
       fprintf(stderr, "rsa_oid_der decode failed to match, %lu, ", y);
       for (z = 0; z < y; z++) fprintf(stderr, "%lu ", oid[0][z]);
       fprintf(stderr, "\n");
@@ -1827,7 +1497,7 @@ int der_test(void)
        /* pick a random number of words */
        ENSURE(yarrow_read(buf[0], 4, &yarrow_prng) == 4);
        LOAD32L(z, buf[0]);
-       z = 2 + (z % ((sizeof(oid[0])/sizeof(oid[0][0])) - 2));
+       z = 2 + (z % (LTC_ARRAY_SIZE(oid[0]) - 2));
 
        /* fill them in */
        oid[0][0] = buf[0][0] % 3;
@@ -1849,7 +1519,7 @@ int der_test(void)
        }
 
        /* decode it */
-       y = sizeof(oid[0])/sizeof(oid[0][0]);
+       y = LTC_ARRAY_SIZE(oid[0]);
        DO(der_decode_object_identifier(buf[0], x, oid[1], &y));
        if (y != z) {
           fprintf(stderr, "Random OID %lu test failed, decode length mismatch: %lu, %lu\n", z, x, y);

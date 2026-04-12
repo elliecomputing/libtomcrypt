@@ -21,11 +21,10 @@ int pkcs_1_oaep_test(void)
   DO(prng_is_valid(prng_idx));
   DO(hash_is_valid(hash_idx));
 
-  for (i = 0; i < sizeof(testcases_oaep)/sizeof(testcases_oaep[0]); ++i) {
+  for (i = 0; i < LTC_ARRAY_SIZE(testcases_oaep); ++i) {
     testcase_t* t = &testcases_oaep[i];
     rsa_key k, *key = &k;
-    DOX(ltc_mp_init_multi(&key->e, &key->d, &key->N, &key->dQ,
-                       &key->dP, &key->qP, &key->p, &key->q, NULL), t->name);
+    DOX(rsa_init(key), t->name);
 
     DOX(ltc_mp_read_unsigned_bin(key->e, t->rsa.e, t->rsa.e_l), t->name);
     DOX(ltc_mp_read_unsigned_bin(key->d, t->rsa.d, t->rsa.d_l), t->name);
@@ -37,7 +36,7 @@ int pkcs_1_oaep_test(void)
     DOX(ltc_mp_read_unsigned_bin(key->p, t->rsa.p, t->rsa.p_l), t->name);
     key->type = PK_PRIVATE;
 
-    for (j = 0; j < sizeof(t->data)/sizeof(t->data[0]); ++j) {
+    for (j = 0; j < LTC_ARRAY_SIZE(t->data); ++j) {
         rsaData_t* s = &t->data[j];
         unsigned char buf[256], obuf[256];
         unsigned long buflen = sizeof(buf), obuflen = sizeof(obuf);

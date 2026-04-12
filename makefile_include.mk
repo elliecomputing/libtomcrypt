@@ -5,8 +5,11 @@
 # The version - BEWARE: VERSION, VERSION_PC and VERSION_LT are updated via ./updatemakes.sh
 VERSION=1.18.2-develop
 VERSION_PC=1.18.2
-# http://www.gnu.org/software/libtool/manual/html_node/Updating-version-info.html
-VERSION_LT=1:1
+# https://semver.org/
+VERSION_MAJOR=1
+VERSION_MINOR=0
+VERSION_PATCH=1
+VERSION_LT=$(VERSION_MAJOR).$(VERSION_MINOR).$(VERSION_PATCH)
 
 # Compiler and Linker Names
 ifndef CROSS_COMPILE
@@ -145,6 +148,12 @@ ifneq ($(GIT_VERSION),)
 LTC_CFLAGS += -DGIT_VERSION=\"$(GIT_VERSION)\"
 endif
 
+ifndef LTC_DEBUG
+ifeq ($(findstring -DARGTYPE,$(CFLAGS)),)
+LTC_CFLAGS += -DARGTYPE=4
+endif
+endif
+
 LTC_CFLAGS := $(LTC_CFLAGS) $(CFLAGS)
 
 ifneq ($(findstring -DLTC_PTHREAD,$(LTC_CFLAGS)),)
@@ -171,7 +180,7 @@ TEST=test
 USEFUL_DEMOS   = hashsum
 
 # Demos that are usable but only rarely make sense to be installed
-USEABLE_DEMOS  = aesgcm constants crypt openssh-privkey openssl-enc pem-info sizes timing
+USEABLE_DEMOS  = aesgcm constants crypt der_print_flexi latex-tables openssh-privkey openssl-enc sizes timing
 
 # Demos that are used for testing or measuring
 TEST_DEMOS     = small tv_gen
@@ -285,8 +294,8 @@ src/misc/crypt/crypt_register_all_ciphers.o src/misc/crypt/crypt_register_all_ha
 src/misc/crypt/crypt_register_all_prngs.o src/misc/crypt/crypt_register_cipher.o \
 src/misc/crypt/crypt_register_hash.o src/misc/crypt/crypt_register_prng.o src/misc/crypt/crypt_sizes.o \
 src/misc/crypt/crypt_unregister_cipher.o src/misc/crypt/crypt_unregister_hash.o \
-src/misc/crypt/crypt_unregister_prng.o src/misc/error_to_string.o src/misc/hkdf/hkdf.o \
-src/misc/hkdf/hkdf_test.o src/misc/mem_neq.o src/misc/padding/padding_depad.o \
+src/misc/crypt/crypt_unregister_prng.o src/misc/deprecated.o src/misc/error_to_string.o \
+src/misc/hkdf/hkdf.o src/misc/hkdf/hkdf_test.o src/misc/mem_neq.o src/misc/padding/padding_depad.o \
 src/misc/padding/padding_pad.o src/misc/password_free.o src/misc/pbes/pbes.o src/misc/pbes/pbes1.o \
 src/misc/pbes/pbes2.o src/misc/pem/pem.o src/misc/pem/pem_pkcs.o src/misc/pem/pem_read.o \
 src/misc/pem/pem_ssh.o src/misc/pkcs12/pkcs12_kdf.o src/misc/pkcs12/pkcs12_utf8_to_utf16.o \
@@ -352,9 +361,10 @@ src/pk/asn1/oid/pk_get.o src/pk/asn1/oid/pk_oid_cmp.o src/pk/asn1/oid/pk_oid_str
 src/pk/asn1/pkcs8/pkcs8_decode_flexi.o src/pk/asn1/pkcs8/pkcs8_get.o \
 src/pk/asn1/x509/x509_decode_public_key_from_certificate.o src/pk/asn1/x509/x509_decode_spki.o \
 src/pk/asn1/x509/x509_decode_subject_public_key_info.o \
-src/pk/asn1/x509/x509_encode_subject_public_key_info.o src/pk/dh/dh.o src/pk/dh/dh_check_pubkey.o \
-src/pk/dh/dh_export.o src/pk/dh/dh_export_key.o src/pk/dh/dh_free.o src/pk/dh/dh_generate_key.o \
-src/pk/dh/dh_import.o src/pk/dh/dh_import_pkcs8.o src/pk/dh/dh_set.o src/pk/dh/dh_set_pg_dhparam.o \
+src/pk/asn1/x509/x509_encode_subject_public_key_info.o src/pk/asn1/x509/x509_get_pka.o \
+src/pk/asn1/x509/x509_import_spki.o src/pk/dh/dh.o src/pk/dh/dh_check_pubkey.o src/pk/dh/dh_export.o \
+src/pk/dh/dh_export_key.o src/pk/dh/dh_free.o src/pk/dh/dh_generate_key.o src/pk/dh/dh_import.o \
+src/pk/dh/dh_import_pkcs8.o src/pk/dh/dh_set.o src/pk/dh/dh_set_pg_dhparam.o \
 src/pk/dh/dh_shared_secret.o src/pk/dsa/dsa_decrypt_key.o src/pk/dsa/dsa_encrypt_key.o \
 src/pk/dsa/dsa_export.o src/pk/dsa/dsa_free.o src/pk/dsa/dsa_generate_key.o \
 src/pk/dsa/dsa_generate_pqg.o src/pk/dsa/dsa_import.o src/pk/dsa/dsa_import_pkcs8.o \
@@ -367,21 +377,22 @@ src/pk/ecc/ecc_encrypt_key.o src/pk/ecc/ecc_export.o src/pk/ecc/ecc_export_opens
 src/pk/ecc/ecc_find_curve.o src/pk/ecc/ecc_free.o src/pk/ecc/ecc_get_key.o src/pk/ecc/ecc_get_oid_str.o \
 src/pk/ecc/ecc_get_size.o src/pk/ecc/ecc_import.o src/pk/ecc/ecc_import_openssl.o \
 src/pk/ecc/ecc_import_pkcs8.o src/pk/ecc/ecc_import_x509.o src/pk/ecc/ecc_make_key.o \
-src/pk/ecc/ecc_recover_key.o src/pk/ecc/ecc_set_curve.o src/pk/ecc/ecc_set_curve_internal.o \
-src/pk/ecc/ecc_set_key.o src/pk/ecc/ecc_shared_secret.o src/pk/ecc/ecc_sign_hash.o \
-src/pk/ecc/ecc_sign_hash_eth27.o src/pk/ecc/ecc_sign_hash_internal.o \
-src/pk/ecc/ecc_sign_hash_rfc5656.o src/pk/ecc/ecc_sign_hash_rfc7518.o src/pk/ecc/ecc_sizes.o \
-src/pk/ecc/ecc_ssh_ecdsa_encode_name.o src/pk/ecc/ecc_verify_hash.o src/pk/ecc/ecc_verify_hash_eth27.o \
-src/pk/ecc/ecc_verify_hash_internal.o src/pk/ecc/ecc_verify_hash_rfc5656.o \
-src/pk/ecc/ecc_verify_hash_rfc7518.o src/pk/ecc/ltc_ecc_export_point.o \
-src/pk/ecc/ltc_ecc_import_point.o src/pk/ecc/ltc_ecc_is_point.o \
-src/pk/ecc/ltc_ecc_is_point_at_infinity.o src/pk/ecc/ltc_ecc_map.o src/pk/ecc/ltc_ecc_mul2add.o \
-src/pk/ecc/ltc_ecc_mulmod.o src/pk/ecc/ltc_ecc_mulmod_timing.o src/pk/ecc/ltc_ecc_points.o \
-src/pk/ecc/ltc_ecc_projective_add_point.o src/pk/ecc/ltc_ecc_projective_dbl_point.o \
-src/pk/ecc/ltc_ecc_verify_key.o src/pk/ed25519/ed25519_export.o src/pk/ed25519/ed25519_import.o \
-src/pk/ed25519/ed25519_import_pkcs8.o src/pk/ed25519/ed25519_import_raw.o \
-src/pk/ed25519/ed25519_import_x509.o src/pk/ed25519/ed25519_make_key.o src/pk/ed25519/ed25519_sign.o \
-src/pk/ed25519/ed25519_verify.o src/pk/pka_key.o src/pk/pkcs1/pkcs_1_i2osp.o src/pk/pkcs1/pkcs_1_mgf1.o \
+src/pk/ecc/ecc_recover_key.o src/pk/ecc/ecc_rfc6979_key.o src/pk/ecc/ecc_set_curve.o \
+src/pk/ecc/ecc_set_curve_internal.o src/pk/ecc/ecc_set_key.o src/pk/ecc/ecc_shared_secret.o \
+src/pk/ecc/ecc_sign_hash.o src/pk/ecc/ecc_sign_hash_eth27.o src/pk/ecc/ecc_sign_hash_internal.o \
+src/pk/ecc/ecc_sign_hash_rfc5656.o src/pk/ecc/ecc_sign_hash_rfc7518.o src/pk/ecc/ecc_sign_hash_x962.o \
+src/pk/ecc/ecc_sizes.o src/pk/ecc/ecc_ssh_ecdsa_encode_name.o src/pk/ecc/ecc_verify_hash.o \
+src/pk/ecc/ecc_verify_hash_eth27.o src/pk/ecc/ecc_verify_hash_internal.o \
+src/pk/ecc/ecc_verify_hash_rfc5656.o src/pk/ecc/ecc_verify_hash_rfc7518.o \
+src/pk/ecc/ecc_verify_hash_x962.o src/pk/ecc/ltc_ecc_export_point.o src/pk/ecc/ltc_ecc_import_point.o \
+src/pk/ecc/ltc_ecc_is_point.o src/pk/ecc/ltc_ecc_is_point_at_infinity.o src/pk/ecc/ltc_ecc_map.o \
+src/pk/ecc/ltc_ecc_mul2add.o src/pk/ecc/ltc_ecc_mulmod.o src/pk/ecc/ltc_ecc_mulmod_timing.o \
+src/pk/ecc/ltc_ecc_points.o src/pk/ecc/ltc_ecc_projective_add_point.o \
+src/pk/ecc/ltc_ecc_projective_dbl_point.o src/pk/ecc/ltc_ecc_verify_key.o \
+src/pk/ed25519/ed25519_export.o src/pk/ed25519/ed25519_import.o src/pk/ed25519/ed25519_import_pkcs8.o \
+src/pk/ed25519/ed25519_import_raw.o src/pk/ed25519/ed25519_import_x509.o \
+src/pk/ed25519/ed25519_make_key.o src/pk/ed25519/ed25519_sign.o src/pk/ed25519/ed25519_verify.o \
+src/pk/pka_key.o src/pk/pkcs1/pkcs_1_i2osp.o src/pk/pkcs1/pkcs_1_mgf1.o \
 src/pk/pkcs1/pkcs_1_oaep_decode.o src/pk/pkcs1/pkcs_1_oaep_encode.o src/pk/pkcs1/pkcs_1_os2ip.o \
 src/pk/pkcs1/pkcs_1_pss_decode.o src/pk/pkcs1/pkcs_1_pss_encode.o src/pk/pkcs1/pkcs_1_v1_5_decode.o \
 src/pk/pkcs1/pkcs_1_v1_5_encode.o src/pk/rsa/rsa_decrypt_key.o src/pk/rsa/rsa_encrypt_key.o \
@@ -414,12 +425,13 @@ endif
 
 # List of test objects to compile (all goes to libtomcrypt_prof.a)
 TOBJECTS=tests/base16_test.o tests/base32_test.o tests/base64_test.o tests/bcrypt_test.o \
-tests/cipher_hash_test.o tests/common.o tests/der_test.o tests/dh_test.o tests/dsa_test.o \
-tests/ecc_test.o tests/ed25519_test.o tests/file_test.o tests/mac_test.o tests/misc_test.o \
-tests/modes_test.o tests/mpi_test.o tests/multi_test.o tests/no_null_termination_check_test.o \
-tests/no_prng.o tests/padding_test.o tests/pem_test.o tests/pkcs_1_eme_test.o tests/pkcs_1_emsa_test.o \
-tests/pkcs_1_oaep_test.o tests/pkcs_1_pss_test.o tests/pkcs_1_test.o tests/prng_test.o \
-tests/rotate_test.o tests/rsa_test.o tests/ssh_test.o tests/store_test.o tests/test.o tests/x25519_test.o
+tests/cipher_hash_test.o tests/common.o tests/deprecated_test.o tests/der_test.o tests/dh_test.o \
+tests/dsa_test.o tests/ecc_test.o tests/ed25519_test.o tests/file_test.o tests/mac_test.o \
+tests/misc_test.o tests/modes_test.o tests/mpi_test.o tests/multi_test.o \
+tests/no_null_termination_check_test.o tests/no_prng.o tests/padding_test.o tests/pem_test.o \
+tests/pk_oid_test.o tests/pkcs_1_eme_test.o tests/pkcs_1_emsa_test.o tests/pkcs_1_oaep_test.o \
+tests/pkcs_1_pss_test.o tests/pkcs_1_test.o tests/prng_test.o tests/rotate_test.o tests/rsa_test.o \
+tests/ssh_test.o tests/store_test.o tests/test.o tests/x25519_test.o
 
 # The following headers will be installed by "make install"
 HEADERS_PUB=src/headers/tomcrypt.h src/headers/tomcrypt_argchk.h src/headers/tomcrypt_cfg.h \
@@ -491,7 +503,7 @@ $(DESTDIR)$(BINPATH):
 	install -p -d $(DESTDIR)$(BINPATH)
 
 .common_install_bins: $(USEFUL_DEMOS) $(DESTDIR)$(BINPATH)
-	for d in $(USEFUL_DEMOS); do $(INSTALL_CMD) -p -m 775 $$d $(DESTDIR)$(BINPATH)/ltc-$$d
+	for d in $(USEFUL_DEMOS); do $(INSTALL_CMD) -p -m 775 $$d $(DESTDIR)$(BINPATH)/ltc-$$d; done
 	$(INSTALL_CMD) -p -m 775 demos/ltc $(DESTDIR)$(BINPATH)
 
 install_docs: $(call print-help,install_docs,Installs the Developer Manual) doc/crypt.pdf
@@ -499,7 +511,7 @@ install_docs: $(call print-help,install_docs,Installs the Developer Manual) doc/
 	install -p -m 644 doc/crypt.pdf $(DESTDIR)$(DATAPATH)
 
 install_test: $(call print-help,install_test,Installs the self-test binary) test $(DESTDIR)$(BINPATH)
-	$(INSTALL_CMD) -p -m 775 $< $(DESTDIR)$(BINPATH)
+	$(INSTALL_CMD) -p -m 775 $< $(DESTDIR)$(BINPATH)/ltc-$<
 
 install_hooks: $(call print-help,install_hooks,Installs the git hooks)
 	for s in `ls hooks/`; do ln -s ../../hooks/$$s .git/hooks/$$s; done
@@ -507,30 +519,31 @@ install_hooks: $(call print-help,install_hooks,Installs the git hooks)
 HEADER_FILES=$(notdir $(HEADERS_PUB))
 .common_uninstall:
 	$(UNINSTALL_CMD) $(DESTDIR)$(LIBPATH)/$(LIBNAME)
-	rm $(HEADER_FILES:%=$(DESTDIR)$(INCPATH)/%)
+	for d in $(USEFUL_DEMOS) test; do rm -f $(DESTDIR)$(BINPATH)/ltc-$$d; done
+	$(UNINSTALL_CMD) $(HEADER_FILES:%=$(DESTDIR)$(INCPATH)/%)
 
 #This rule cleans the source tree of all compiled code, not including the pdf
 #documentation.
 clean: $(call print-help,clean,Clean everything besides the pdf documentation)
 	find . -type f    -name "*.o"   \
-               -o -name "*.lo"  \
-               -o -name "*.a"   \
-               -o -name "*.la"  \
-               -o -name "*.obj" \
-               -o -name "*.lib" \
-               -o -name "*.exe" \
-               -o -name "*.dll" \
-               -o -name "*.so"  \
-               -o -name "*.gcov"\
-               -o -name "*.gcda"\
-               -o -name "*.gcno"\
-               -o -name "*.il"  \
-               -o -name "*.dyn" \
+               -o -name "*.a"     \
+               -o -name "*.obj"   \
+               -o -name "*.lib"   \
+               -o -name "*.exe"   \
+               -o -name "*.dll*"  \
+               -o -name "*.dylib*"\
+               -o -name "*.so*"   \
+               -o -name "*.out"   \
+               -o -name "*.gcov"  \
+               -o -name "*.gcda"  \
+               -o -name "*.gcno"  \
+               -o -name "*.il"    \
+               -o -name "*.dyn"   \
                -o -name "*.dpi"  | xargs rm -f
 	rm -f $(TIMING) $(TEST) $(DEMOS)
 	rm -f *_tv.txt
 	rm -f *.pc
-	rm -rf `find . -type d -name "*.libs" | xargs`
+	rm -rf `find . -type d -name "*.bin" | xargs`
 	$(MAKE) -C doc/ clean
 
 zipup: $(call print-help,zipup,Prepare the archives for a release) doc/crypt.pdf

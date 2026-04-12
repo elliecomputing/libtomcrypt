@@ -73,14 +73,14 @@ int lrw_test(void)
      }
   }
 
-  for (x = 0; x < (int)(sizeof(tests)/sizeof(tests[0])); x++) {
+  for (x = 0; x < (int)LTC_ARRAY_SIZE(tests); x++) {
      /* schedule it */
      if ((err = lrw_start(idx, tests[x].IV, tests[x].key, 16, tests[x].tweak, 0, &lrw)) != CRYPT_OK) {
         return err;
      }
 
      /* check pad against expected tweak */
-     if (compare_testvector(tests[x].expected_tweak, 16, lrw.pad, 16, "LRW Tweak", x)) {
+     if (ltc_compare_testvector(tests[x].expected_tweak, 16, lrw.pad, 16, "LRW Tweak", x)) {
         lrw_done(&lrw);
         return CRYPT_FAIL_TESTVECTOR;
      }
@@ -91,7 +91,7 @@ int lrw_test(void)
         return err;
      }
 
-     if (compare_testvector(buf[0], 16, tests[x].C, 16, "LRW Encrypt", x)) {
+     if (ltc_compare_testvector(buf[0], 16, tests[x].C, 16, "LRW Encrypt", x)) {
         lrw_done(&lrw);
         return CRYPT_FAIL_TESTVECTOR;
      }
@@ -107,7 +107,7 @@ int lrw_test(void)
         return err;
      }
 
-     if (compare_testvector(buf[1], 16, tests[x].P, 16, "LRW Decrypt", x)) {
+     if (ltc_compare_testvector(buf[1], 16, tests[x].P, 16, "LRW Decrypt", x)) {
         lrw_done(&lrw);
         return CRYPT_FAIL_TESTVECTOR;
      }

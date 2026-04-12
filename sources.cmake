@@ -232,6 +232,7 @@ src/misc/crypt/crypt_sizes.c
 src/misc/crypt/crypt_unregister_cipher.c
 src/misc/crypt/crypt_unregister_hash.c
 src/misc/crypt/crypt_unregister_prng.c
+src/misc/deprecated.c
 src/misc/error_to_string.c
 src/misc/hkdf/hkdf.c
 src/misc/hkdf/hkdf_test.c
@@ -372,6 +373,8 @@ src/pk/asn1/x509/x509_decode_public_key_from_certificate.c
 src/pk/asn1/x509/x509_decode_spki.c
 src/pk/asn1/x509/x509_decode_subject_public_key_info.c
 src/pk/asn1/x509/x509_encode_subject_public_key_info.c
+src/pk/asn1/x509/x509_get_pka.c
+src/pk/asn1/x509/x509_import_spki.c
 src/pk/dh/dh.c
 src/pk/dh/dh_check_pubkey.c
 src/pk/dh/dh_export.c
@@ -421,6 +424,7 @@ src/pk/ecc/ecc_import_pkcs8.c
 src/pk/ecc/ecc_import_x509.c
 src/pk/ecc/ecc_make_key.c
 src/pk/ecc/ecc_recover_key.c
+src/pk/ecc/ecc_rfc6979_key.c
 src/pk/ecc/ecc_set_curve.c
 src/pk/ecc/ecc_set_curve_internal.c
 src/pk/ecc/ecc_set_key.c
@@ -430,6 +434,7 @@ src/pk/ecc/ecc_sign_hash_eth27.c
 src/pk/ecc/ecc_sign_hash_internal.c
 src/pk/ecc/ecc_sign_hash_rfc5656.c
 src/pk/ecc/ecc_sign_hash_rfc7518.c
+src/pk/ecc/ecc_sign_hash_x962.c
 src/pk/ecc/ecc_sizes.c
 src/pk/ecc/ecc_ssh_ecdsa_encode_name.c
 src/pk/ecc/ecc_verify_hash.c
@@ -437,6 +442,7 @@ src/pk/ecc/ecc_verify_hash_eth27.c
 src/pk/ecc/ecc_verify_hash_internal.c
 src/pk/ecc/ecc_verify_hash_rfc5656.c
 src/pk/ecc/ecc_verify_hash_rfc7518.c
+src/pk/ecc/ecc_verify_hash_x962.c
 src/pk/ecc/ltc_ecc_export_point.c
 src/pk/ecc/ltc_ecc_import_point.c
 src/pk/ecc/ltc_ecc_is_point.c

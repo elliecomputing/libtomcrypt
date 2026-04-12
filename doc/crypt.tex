@@ -3075,9 +3075,26 @@ int main(void)
 }
 \end{verbatim}
 
-\mysection{SHA3 SHAKE}
+\mysection{Extendable Output Functions (XOF)}
+Some algorithms provide a special XOF (Extendable Output Functions) mode which allow to generate message digests of an arbitrary length.
+
+The library supports the following XOFs.
+
+\subsection{SHA3 SHAKE}
 The SHA3 class of algorithms provides a special XOF (Extendable Output Functions) mode, called SHAKE.
 SHAKE operates in 2 security configurations, 128bit or 256bit, and allows to generate message digests of an arbitrary length.
+
+The API functions are as follows.
+
+\begin{small}
+\begin{verbatim}
+int sha3_shake_init(hash_state *md, int num);
+int sha3_shake_process(hash_state * md, const unsigned char *in, unsigned long inlen);
+int sha3_shake_done(hash_state *md, unsigned char *out, unsigned long outlen);
+\end{verbatim}
+\end{small}
+
+The process function \code{sha3\_shake\_process()} is implemented as a macro which calls \code{sha3\_process()}.
 
 For further information see \url{https://en.wikipedia.org/wiki/SHA-3}
 
@@ -3109,6 +3126,37 @@ int main(void)
 }
 \end{verbatim}
 \end{small}
+
+\subsection{TurboSHAKE}
+Another variation of SHA3 SHAKE is TurboSHAKE, which has been specified in \href{https://datatracker.ietf.org/doc/rfc9861/}{\texttt{RFC 9861}}.
+
+The API works equivalent to the one of SHA3 SHAKE, where the APIs only have a different name.
+
+\begin{small}
+\begin{verbatim}
+int turbo_shake_init(hash_state *md, int num);
+int turbo_shake_process(hash_state *md, const unsigned char *in, unsigned long inlen);
+int turbo_shake_done(hash_state *md, unsigned char *out, unsigned long outlen);
+\end{verbatim}
+\end{small}
+
+The init function \code{turbo\_shake\_init()} is implemented as a macro which calls \code{sha3\_shake\_init()}.
+
+
+\subsection{KangarooTwelve}
+Another variation of SHA3 SHAKE is KangarooTwelve, which has been specified in \href{https://datatracker.ietf.org/doc/rfc9861/}{\texttt{RFC 9861}}.
+
+The API works equivalent to the one of SHA3 SHAKE, where the APIs only have a different name. Additionally, KangarooTwelve supports customization. You can append any or none customization bytes after all input bytes and before squeezing any output digest bytes.
+
+\begin{small}
+\begin{verbatim}
+int kangaroo_twelve_init(hash_state *md, int num);
+int kangaroo_twelve_process(hash_state *md, const unsigned char *in, unsigned long inlen);
+int kangaroo_twelve_customization(hash_state *md, const unsigned char *in, unsigned long inlen);
+int kangaroo_twelve_done(hash_state *md, unsigned char *out, unsigned long outlen);
+\end{verbatim}
+\end{small}
+
 
 \mysection{Extended Tiger API}
 
@@ -5331,42 +5379,42 @@ defined by own parameters (the only limitation is that the curve must be based o
 \begin{table}[H]
 \begin{center}
 \begin{tabular}{|l|l|l|l|}
-      \hline \textbf{Curve Name} & \textbf{Alternative Names}  & \textbf{OID}          \\
-      \hline secp112r1           &                             & 1.3.132.0.6           \\
-      \hline secp112r2           &                             & 1.3.132.0.7           \\
-      \hline secp128r1           &                             & 1.3.132.0.28          \\
-      \hline secp128r2           &                             & 1.3.132.0.29          \\
-      \hline secp160r1           &                             & 1.3.132.0.8           \\
-      \hline secp160r2           &                             & 1.3.132.0.30          \\
-      \hline secp160k1           &                             & 1.3.132.0.9           \\
-      \hline secp192r1           & nistp192, prime192v1, P-192 & 1.2.840.10045.3.1.1   \\
-      \hline prime192v2          &                             & 1.2.840.10045.3.1.2   \\
-      \hline prime192v3          &                             & 1.2.840.10045.3.1.3   \\
-      \hline secp192k1           &                             & 1.3.132.0.31          \\
-      \hline secp224r1           & nistp224, P-224             & 1.3.132.0.33          \\
-      \hline secp224k1           &                             & 1.3.132.0.32          \\
-      \hline secp256r1           & nistp256, prime256v1, P-256 & 1.2.840.10045.3.1.7   \\
-      \hline secp256k1           &                             & 1.3.132.0.10          \\
-      \hline secp384r1           & nistp384, P-384             & 1.3.132.0.34          \\
-      \hline secp521r1           & nistp521, P-521             & 1.3.132.0.35          \\
-      \hline prime239v1          &                             & 1.2.840.10045.3.1.4   \\
-      \hline prime239v2          &                             & 1.2.840.10045.3.1.5   \\
-      \hline prime239v3          &                             & 1.2.840.10045.3.1.6   \\
-      \hline brainpoolP160r1     &                             & 1.3.36.3.3.2.8.1.1.1  \\
-      \hline brainpoolP192r1     &                             & 1.3.36.3.3.2.8.1.1.3  \\
-      \hline brainpoolP224r1     &                             & 1.3.36.3.3.2.8.1.1.5  \\
-      \hline brainpoolP256r1     &                             & 1.3.36.3.3.2.8.1.1.7  \\
-      \hline brainpoolP320r1     &                             & 1.3.36.3.3.2.8.1.1.9  \\
-      \hline brainpoolP384r1     &                             & 1.3.36.3.3.2.8.1.1.11 \\
-      \hline brainpoolP512r1     &                             & 1.3.36.3.3.2.8.1.1.13 \\
-      \hline brainpoolP160t1     &                             & 1.3.36.3.3.2.8.1.1.2  \\
-      \hline brainpoolP192t1     &                             & 1.3.36.3.3.2.8.1.1.4  \\
-      \hline brainpoolP224t1     &                             & 1.3.36.3.3.2.8.1.1.6  \\
-      \hline brainpoolP256t1     &                             & 1.3.36.3.3.2.8.1.1.8  \\
-      \hline brainpoolP320t1     &                             & 1.3.36.3.3.2.8.1.1.10 \\
-      \hline brainpoolP384t1     &                             & 1.3.36.3.3.2.8.1.1.12 \\
-      \hline brainpoolP512t1     &                             & 1.3.36.3.3.2.8.1.1.14 \\
-      \hline
+\hline \textbf{Curve Name}      & \textbf{Alternative Names}           & \textbf{OID}          \\
+\hline \texttt{secp112r1}       & ECC-112                              & 1.3.132.0.6           \\
+\hline \texttt{secp112r2}       &                                      & 1.3.132.0.7           \\
+\hline \texttt{secp128r1}       & ECC-128                              & 1.3.132.0.28          \\
+\hline \texttt{secp128r2}       &                                      & 1.3.132.0.29          \\
+\hline \texttt{secp160r1}       & ECC-160                              & 1.3.132.0.8           \\
+\hline \texttt{secp160r2}       &                                      & 1.3.132.0.30          \\
+\hline \texttt{secp160k1}       &                                      & 1.3.132.0.9           \\
+\hline \texttt{secp192r1}       & nistp192, prime192v1, ECC-192, P-192 & 1.2.840.10045.3.1.1   \\
+\hline \texttt{prime192v2}      &                                      & 1.2.840.10045.3.1.2   \\
+\hline \texttt{prime192v3}      &                                      & 1.2.840.10045.3.1.3   \\
+\hline \texttt{secp192k1}       &                                      & 1.3.132.0.31          \\
+\hline \texttt{secp224r1}       & nistp224, ECC-224, P-224             & 1.3.132.0.33          \\
+\hline \texttt{secp224k1}       &                                      & 1.3.132.0.32          \\
+\hline \texttt{secp256r1}       & nistp256, prime256v1, ECC-256, P-256 & 1.2.840.10045.3.1.7   \\
+\hline \texttt{secp256k1}       &                                      & 1.3.132.0.10          \\
+\hline \texttt{secp384r1}       & nistp384, ECC-384, P-384             & 1.3.132.0.34          \\
+\hline \texttt{secp521r1}       & nistp521, ECC-521, P-521             & 1.3.132.0.35          \\
+\hline \texttt{prime239v1}      &                                      & 1.2.840.10045.3.1.4   \\
+\hline \texttt{prime239v2}      &                                      & 1.2.840.10045.3.1.5   \\
+\hline \texttt{prime239v3}      &                                      & 1.2.840.10045.3.1.6   \\
+\hline \texttt{brainpoolp160r1} &                                      & 1.3.36.3.3.2.8.1.1.1  \\
+\hline \texttt{brainpoolp192r1} &                                      & 1.3.36.3.3.2.8.1.1.3  \\
+\hline \texttt{brainpoolp224r1} &                                      & 1.3.36.3.3.2.8.1.1.5  \\
+\hline \texttt{brainpoolp256r1} &                                      & 1.3.36.3.3.2.8.1.1.7  \\
+\hline \texttt{brainpoolp320r1} &                                      & 1.3.36.3.3.2.8.1.1.9  \\
+\hline \texttt{brainpoolp384r1} &                                      & 1.3.36.3.3.2.8.1.1.11 \\
+\hline \texttt{brainpoolp512r1} &                                      & 1.3.36.3.3.2.8.1.1.13 \\
+\hline \texttt{brainpoolp160t1} &                                      & 1.3.36.3.3.2.8.1.1.2  \\
+\hline \texttt{brainpoolp192t1} &                                      & 1.3.36.3.3.2.8.1.1.4  \\
+\hline \texttt{brainpoolp224t1} &                                      & 1.3.36.3.3.2.8.1.1.6  \\
+\hline \texttt{brainpoolp256t1} &                                      & 1.3.36.3.3.2.8.1.1.8  \\
+\hline \texttt{brainpoolp320t1} &                                      & 1.3.36.3.3.2.8.1.1.10 \\
+\hline \texttt{brainpoolp384t1} &                                      & 1.3.36.3.3.2.8.1.1.12 \\
+\hline \texttt{brainpoolp512t1} &                                      & 1.3.36.3.3.2.8.1.1.14 \\
+\hline
 \end{tabular}
 \caption{Built--In Elliptic Curves over GF(p)}
 \end{center}
@@ -5542,16 +5590,6 @@ int ecc_set_curve_by_size(    int  keysize,
 \end{verbatim}
 
 The \textit{keysize} maps to the specific curve according to table \ref{fig:legacy-curve-names}.
-
-\subsection{Key Free}
-To free the memory allocated by one of \textit{ecc\_generate\_key()}, \textit{ecc\_make\_key()}, \textit{ecc\_make\_key\_ex()}, \textit{ecc\_import()},
-\textit{ecc\_import\_openssl()}, \textit{ecc\_import\_x509()}, \textit{ecc\_import\_pkcs8()}, \textit{ecc\_ansi\_x963\_import()},
-\textit{ecc\_ansi\_x963\_import\_ex()}, or \textit{ecc\_set\_key()} the following function is provided:
-
-\index{ecc\_free()}
-\begin{verbatim}
-void ecc_free(ecc_key *key);
-\end{verbatim}
 
 \subsection{Key Helper Functions}
 To get the curve OID as a NUL--terminated string the following function is provided:
@@ -5802,6 +5840,32 @@ This will import the key stored in the array pointed to by \textit{in} of length
 The imported key is stored in the ECC key pointed to by \textit{key}.  The function will free any allocated memory upon error.
 
 
+\mysection{Key Free}
+Any ECC API function which imports, generates, or finds (part of) a key with an argument of type
+\code{ecc\_key*} must upon success call the following function to free the memory allocated.
+
+\index{ecc\_free()}
+\begin{verbatim}
+void ecc_free(ecc_key *key);
+\end{verbatim}
+
+The following list of API functions must call \code{ecc\_free()} upon success:
+
+\code{ecc\_ansi\_x963\_import()},
+\code{ecc\_ansi\_x963\_import\_ex()},
+\code{ecc\_copy\_curve()},
+\code{ecc\_generate\_key()},
+\code{ecc\_import()},
+\code{ecc\_import\_ex()},
+\code{ecc\_import\_openssl()},
+\code{ecc\_import\_pkcs8()},
+\code{ecc\_import\_x509()},
+\code{ecc\_make\_key()},
+\code{ecc\_make\_key\_ex()},
+\code{ecc\_set\_curve()},
+\code{ecc\_set\_key()}.
+
+
 \mysection{Signatures (ECDSA)}
 There are also functions to sign and verify messages. They use the \textit{ANSI X9.62} \textit{ECDSA} algorithm to generate and verify signatures in the
 \textit{ANSI X9.62} format.
@@ -5812,134 +5876,97 @@ by the size of the hash, or the size of the key, whichever is smaller.  For exam
 P--192 key, you have in effect 96--bits of security. The library will not warn you if you make this mistake, so it
 is important to check yourself before using the signatures.
 
+\subsection{Signature Options}
+
+The library supports ECDSA signatures in the following formats.
+
+\index{ecc\_signature\_type}
+\begin{small}
+\begin{verbatim}
+typedef enum ecc_signature_type {
+   /* ASN.1 encoded, ANSI X9.62 */
+   LTC_ECCSIG_ANSIX962   = 0x0,
+   /* raw R, S values */
+   LTC_ECCSIG_RFC7518    = 0x1,
+   /* raw R, S, V (+27) values */
+   LTC_ECCSIG_ETH27      = 0x2,
+   /* SSH + ECDSA signature format defined by RFC5656 */
+   LTC_ECCSIG_RFC5656    = 0x3,
+} ecc_signature_type;
+\end{verbatim}
+\end{small}
+
+c.f. Chapter \ref{sigformat} for further details.
+
+To parametrize the signature API, a specific type \code{ltc\_ecc\_sig\_opts} exists, which must be populated with the desired values.
+
+\index{ltc\_ecc\_sig\_opts}
+\begin{small}
+\begin{verbatim}
+typedef struct ltc_ecc_sig_opts {
+   /** Signature type */
+   ecc_signature_type type;
+   /** The PRNG to use.
+    *  This must be set in case deterministic signature generation
+    *  according to RFC6979 is not enabled.
+    */
+   prng_state *prng;
+   int wprng;
+
+   /** Enable generation of a recovery ID.
+    *  This must be set in case one requires the recovery ID of a
+    *  signature operation.
+    */
+   int *recid;
+
+   /** The hash algorithm to use when creating a signature.
+    *  Setting this will enable RFC6979 compatible signature generation.
+    */
+   const char *rfc6979_hash_alg;
+} ltc_ecc_sig_opts;
+\end{verbatim}
+\end{small}
+
 \subsection{Signature Generation}
+\label{ecc-sign}
 To sign a message digest (hash) use the following function:
 
-\index{ecc\_sign\_hash()}
+\index{ecc\_sign\_hash\_v2()}
 \begin{verbatim}
-int ecc_sign_hash(const unsigned char *in,
-                        unsigned long  inlen,
-                        unsigned char *out,
-                        unsigned long *outlen,
-                           prng_state *prng,
-                                  int  wprng,
-                  const       ecc_key *key);
+int ecc_sign_hash_v2(const unsigned char    *in,
+                           unsigned long     inlen,
+                           unsigned char    *out,
+                           unsigned long    *outlen,
+                           ltc_ecc_sig_opts *opts,
+                     const       ecc_key    *key);
 \end{verbatim}
 
 This function will \textit{ECDSA} sign the message digest stored in the array pointed to by \code{in} of length \code{inlen} octets.  The signature
-will be stored in the array pointed to by \code{out} of length \code{outlen} octets.  The function requires a properly seeded \textit{PRNG}, and
-the \textit{ECC} \code{key} provided must be a private key.
+will be stored in the array pointed to by \code{out} of length \code{outlen} octets.  The function requires that the \textit{ECC}
+\code{key} provided must be a private key.
 
-\index{ecc\_sign\_hash\_rfc7518()}
-\begin{verbatim}
-int ecc_sign_hash_rfc7518(const unsigned char *in,
-                                unsigned long  inlen,
-                                unsigned char *out,
-                                unsigned long *outlen,
-                                   prng_state *prng,
-                                          int  wprng,
-                          const       ecc_key *key);
-\end{verbatim}
+In order to execute standard \textit{ECDSA} it requires a properly seeded \textit{PRNG} which gets passed via \code{opts.prng} and \code{opts.wprng}.
 
-This function creates the same \textit{ECDSA} signature as \code{ecc\_sign\_hash()} only the output format is different.
-The format follows \url{https://tools.ietf.org/html/rfc7518#section-3.4}, sometimes it is also called plain signature.
-
-\index{ecc\_sign\_hash\_rfc7518\_ex()}
-\begin{verbatim}
-int ecc_sign_hash_rfc7518_ex(const unsigned char *in,
-                                   unsigned long  inlen,
-                                   unsigned char *out,
-                                   unsigned long *outlen,
-                                      prng_state *prng,
-                                             int  wprng,
-                                             int *recid,
-                             const       ecc_key *key);
-\end{verbatim}
-
-This function is an extended version of the \textit{ECDSA} signature in \code{ecc\_sign\_hash\_rfc7518()}, but with an additional output of the recovery ID
-for use with \code{ecc\_recover\_key()}.
-
-\index{ecc\_sign\_hash\_rfc5656()}
-\begin{verbatim}
-int ecc_sign_hash_rfc5656(const unsigned char *in,
-                                unsigned long  inlen,
-                                unsigned char *out,
-                                unsigned long *outlen,
-                                   prng_state *prng,
-                                          int  wprng,
-                          const       ecc_key *key);
-\end{verbatim}
-
-This function creates an \textit{ECDSA} signature and the output format is according to \textit{RFC5656}, i.e. \textit{SSH} compatible.
-
-\index{ecc\_sign\_hash\_eth27()}
-\begin{verbatim}
-int ecc_sign_hash_eth27(const unsigned char *in,
-                              unsigned long  inlen,
-                              unsigned char *out,
-                              unsigned long *outlen,
-                                 prng_state *prng,
-                                        int  wprng,
-                        const       ecc_key *key);
-\end{verbatim}
-
-This function creates an \textit{ECDSA} signature and the output format is according to the Ethereum format.
-With this API the curve is limited to \textit{secp256k1}.
+The deterministic signature mechanism according to \textit{RFC6979} is also supported. This does not require a \textit{PRNG}, but
+instead a valid hash function name shall be set in the options' field \code{opts.rfc6979\_hash\_alg}.
 
 \subsection{Signature Verification}
-\index{ecc\_verify\_hash()}
+\label{ecc-verify}
+\index{ecc\_verify\_hash\_v2()}
 \begin{verbatim}
-int ecc_verify_hash(const unsigned char *sig,
-                          unsigned long  siglen,
-                    const unsigned char *hash,
-                          unsigned long  hashlen,
-                                    int *stat,
-                    const       ecc_key *key);
+int ecc_verify_hash_v2(const unsigned char *sig,
+                             unsigned long  siglen,
+                       const unsigned char *hash,
+                             unsigned long  hashlen,
+                          ltc_ecc_sig_opts *opts,
+                                       int *stat,
+                       const       ecc_key *key);
 \end{verbatim}
 
 This function will verify the \textit{ECDSA} signature in the array pointed to by \code{sig} of length \code{siglen} octets, against the message digest
 pointed to by the array \code{hash} of length \code{hashlen}. It will store a non--zero value in \code{stat} if the signature is valid.  Note:
 the function will not return an error if the signature is invalid. It will return an error, if the actual signature payload is an invalid format.
 The \textit{ECC} \code{key} must be the public (or private) \textit{ECC} key corresponding to the key that performed the signature.
-The function \code{ecc\_verify\_hash()} implements signature format according to \textit{ANSI X9.62} EC\textit{DSA}, and the output is compliant for GF(p) curves.
-
-\index{ecc\_verify\_hash\_rfc7518()}
-\begin{verbatim}
-int ecc_verify_hash_rfc7518(const unsigned char *sig,
-                                  unsigned long  siglen,
-                            const unsigned char *hash,
-                                  unsigned long  hashlen,
-                                            int *stat,
-                            const       ecc_key *key);
-\end{verbatim}
-
-This function validates the \textit{ECDSA} signature as \code{ecc\_verify\_hash()}, only the signature input format
-follows \url{https://tools.ietf.org/html/rfc7518#section-3.4}.
-
-\index{ecc\_verify\_hash\_rfc5656()}
-\begin{verbatim}
-int ecc_verify_hash_rfc5656(const unsigned char *sig,
-                                  unsigned long  siglen,
-                            const unsigned char *hash,
-                                  unsigned long  hashlen,
-                                            int *stat,
-                            const       ecc_key *key);
-\end{verbatim}
-
-This function validates the \textit{ECDSA} signature according to the format defined in \textit{RFC5656}, i.e. \textit{SSH} compatible.
-
-
-\index{ecc\_verify\_hash\_eth27()}
-\begin{verbatim}
-int ecc_verify_hash_eth27(const unsigned char *sig,
-                                unsigned long  siglen,
-                          const unsigned char *hash,
-                                unsigned long  hashlen,
-                                          int *stat,
-                          const       ecc_key *key);
-\end{verbatim}
-
-This function validates the \textit{ECDSA} signature according to the Ethereum format.
 
 \subsection{Public Key Recovery}
 \index{ecc\_recover\_key()}
@@ -5967,6 +5994,7 @@ extract the recovery id from such a signature in order to use this function.
 The function \code{ecc\_recover\_key()} implements multiple signature formats, and the output is compliant for GF(p) curves.
 
 \subsection{Signature Formats}
+\label{sigformat}
 The following signature formats are suported:
 
 \begin{figure}[hpbt]
@@ -5975,10 +6003,10 @@ The following signature formats are suported:
 \begin{center}
 \begin{tabular}{|l|l|}
 \hline \textbf{sigformat} & \textbf{description} \\
-\hline LTC\_ECCSIG\_ANSIX962 & ASN.1 encoded, \textit{ANSI X9.62} \\
-\hline LTC\_ECCSIG\_RFC7518 & raw R, S values as defined in \textit{RFC7518} \\
-\hline LTC\_ECCSIG\_ETH27 & raw R, S, V values (V has 27 added) \\
-\hline LTC\_ECCSIG\_RFC5656 & \textit{SSH+ECDSA} format as defined in \textit{RFC5656} \\
+\hline \code{LTC\_ECCSIG\_ANSIX962} & ASN.1 encoded, \textit{ANSI X9.62} \\
+\hline \code{LTC\_ECCSIG\_RFC7518} & raw R, S values as defined in \textit{RFC7518} \\
+\hline \code{LTC\_ECCSIG\_ETH27} & raw R, S, V values (V has 27 added) \\
+\hline \code{LTC\_ECCSIG\_RFC5656} & \textit{SSH+ECDSA} format as defined in \textit{RFC5656} \\
 \hline
 \end{tabular}
 \end{center}
@@ -5990,6 +6018,8 @@ The following signature formats are suported:
 The \code{LTC\_ECCSIG\_ETH27} format is based on the Ethereum Yellow Paper, see \url{https://github.com/ethereum/yellowpaper}
 (Appendix F). However, convention allows the use of v=0,1 as equivalent to v=27,28 and both are accepted by
 \code{ecc\_recover\_key()}.
+
+When using \code{LTC\_ECCSIG\_ETH27} the curve is limited to \textit{secp256k1}.
 
 \textbf{NOTE:} If you're using a tailored version of libtomcrypt, it is possible to disable \code{LTC\_DER} which will disable
 the option to use \code{LTC\_ECCSIG\_ANSIX962}. Also it is possible to disable \code{LTC\_SSH} which will disable
@@ -8716,6 +8746,7 @@ pthreads based mutex locking in various routines such as the Yarrow and Fortuna 
 
 \chapter{Configuring and Building the Library}
 \mysection{Introduction}
+\index{math descriptor} \index{MPI provider}
 The library is fairly flexible about how it can be built, used, and generally distributed.  Additions are being made with
 each new release that will make the library even more flexible.  Each of the classes of functions can be disabled during
 the build process to make a smaller library.  This is particularly useful for shared libraries.
@@ -8727,6 +8758,13 @@ The build process now consists of installing a math library first, and then buil
 configured.  Note that LibTomCrypt can be built with no internal math descriptors.  This means that one must be provided at either
 build, or run time for the application.  LibTomCrypt comes with three math descriptors that provide a standard interface to math
 libraries.
+
+Clarification regarding the wording in this area: 'MPI provider' and 'math descriptor' can be used synonymous.
+Where the former usually means 'one of the entire set' and the latter means 'a specific'.
+E.g. 'One can enable multiple MPI providers at build time, but has to select one of those MPI providers at run time.',
+or 'The math descriptor for TomsFastMath is missing an implementation of \code{sqrtmod\_prime()}.'.
+
+Please check Ch. \ref{mp-init} for details on the selection of an MPI provider at build, resp. run time.
 
 \mysection{Makefile variables}
 
@@ -9086,6 +9124,12 @@ of GCM output on both the AMD64 and Intel Pentium 4 platforms.  Requires GCC and
 When this is defined some of the code such as the Rijndael and SAFER+ ciphers are replaced with smaller code variants.
 These variants are slower but can save quite a bit of code space.
 
+\subsection{LTC\_SMALL\_STACK}
+When this is defined some of the code uses a variant which results in smaller stack sizes.
+Depending on the architecture and other configuration options the results of execution speeed can vary.
+Therefore we try to enable this automatically where it brings an advantage in speed.
+In case you always want smaller stack usage, no matter if it makes the execution slower, you should enable this.
+
 \subsection{LTC\_PTHREAD}
 When this is activated all of the descriptor table functions will use pthread locking to ensure thread safe updates to the tables.  Note that
 it doesn't prevent a thread that is passively using a table from being messed up by another thread that updates the table.
@@ -9111,6 +9155,8 @@ When this has been defined the RSA modular exponentiation will do some sanity ch
 This is enabled by default and can be disabled by defining \textbf{LTC\_NO\_RSA\_CRT\_HARDENING}.
 
 \subsection{Math Descriptors}
+\index{math descriptor} \index{MPI provider}
+\label{mp-init}
 The library comes with three math descriptors that allow you to interface the public key cryptography API to freely available math
 libraries.  When \textbf{GMP\_DESC}, \textbf{LTM\_DESC}, or \textbf{TFM\_DESC} are defined
 descriptors for the respective library are built and included in the library as \textit{gmp\_desc}, \textit{ltm\_desc}, or \textit{tfm\_desc} respectively.
@@ -10349,16 +10395,55 @@ Since the function is given the entire RSA key (for private keys only) CRT is po
 
 \mysection{Deprecated API functions}
 
-\subsection{After v1.18.0}
+\subsection{Elliptic Curve Cryptography - $GF(p)$}
 
-\index{init\_LTM()} \index{init\_TFM()} \index{init\_GMP()}
+\index{ecc\_sign\_hash()}
 \begin{verbatim}
-void init_LTM(void);
-void init_TFM(void);
-void init_GMP(void);
+int ecc_sign_hash(const unsigned char *in,
+                        unsigned long  inlen,
+                        unsigned char *out,
+                        unsigned long *outlen,
+                           prng_state *prng,
+                                  int  wprng,
+                  const       ecc_key *key);
 \end{verbatim}
 
-These three MPI init functions have been introduced in version 1.18.0 and have been deprecated in the same version in favor of \textit{crypt\_mp\_init()}.
+\index{ecc\_sign\_hash\_rfc7518()}
+\begin{verbatim}
+int ecc_sign_hash_rfc7518(const unsigned char *in,
+                                unsigned long  inlen,
+                                unsigned char *out,
+                                unsigned long *outlen,
+                                   prng_state *prng,
+                                          int  wprng,
+                          const       ecc_key *key);
+\end{verbatim}
+
+These two ECC sign functions have been deprecated in favor of \code{ecc\_sign\_hash\_v2()}.
+Please check Chapter \ref{ecc-sign} for details.
+
+\index{ecc\_verify\_hash()}
+\begin{verbatim}
+int ecc_verify_hash(const unsigned char *sig,
+                          unsigned long  siglen,
+                    const unsigned char *hash,
+                          unsigned long  hashlen,
+                                    int *stat,
+                    const       ecc_key *key);
+\end{verbatim}
+
+\index{ecc\_verify\_hash\_rfc7518()}
+\begin{verbatim}
+int ecc_verify_hash_rfc7518(const unsigned char *sig,
+                                  unsigned long  siglen,
+                            const unsigned char *hash,
+                                  unsigned long  hashlen,
+                                            int *stat,
+                            const       ecc_key *key);
+\end{verbatim}
+
+These two ECC verify functions have been deprecated in favor of \code{ecc\_verify\_hash\_v2()}.
+Please check Chapter \ref{ecc-verify} for details.
 
 \clearpage
 \addcontentsline{toc}{chapter}{Index}

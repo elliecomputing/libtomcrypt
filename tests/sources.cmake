@@ -5,6 +5,7 @@ base64_test.c
 bcrypt_test.c
 cipher_hash_test.c
 common.c
+deprecated_test.c
 der_test.c
 dh_test.c
 dsa_test.c
@@ -20,6 +21,7 @@ no_null_termination_check_test.c
 no_prng.c
 padding_test.c
 pem_test.c
+pk_oid_test.c
 pkcs_1_eme_test.c
 pkcs_1_emsa_test.c
 pkcs_1_oaep_test.c

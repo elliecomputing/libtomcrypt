@@ -108,7 +108,7 @@ int ccm_test(void)
    unsigned long taglen, x, y;
    unsigned char buf[64], buf2[64], tag[16], tag2[16], tag3[16], zero[64];
    int           err, idx;
-   symmetric_key skey;
+   symmetric_ECB skey;
    ccm_state ccm;
 
    zeromem(zero, 64);
@@ -121,11 +121,11 @@ int ccm_test(void)
       }
    }
 
-   for (x = 0; x < (sizeof(tests)/sizeof(tests[0])); x++) {
+   for (x = 0; x < LTC_ARRAY_SIZE(tests); x++) {
       for (y = 0; y < 2; y++) {
          taglen = tests[x].taglen;
          if (y == 0) {
-            if ((err = cipher_descriptor[idx].setup(tests[x].key, 16, 0, &skey)) != CRYPT_OK) {
+            if ((err = ecb_start(idx, tests[x].key, 16, 0, &skey)) != CRYPT_OK) {
                return err;
             }
 
@@ -168,10 +168,10 @@ int ccm_test(void)
             }
          }
 
-         if (compare_testvector(buf, tests[x].ptlen, tests[x].ct, tests[x].ptlen, "CCM encrypt data", x)) {
+         if (ltc_compare_testvector(buf, tests[x].ptlen, tests[x].ct, tests[x].ptlen, "CCM encrypt data", x)) {
             return CRYPT_FAIL_TESTVECTOR;
          }
-         if (compare_testvector(tag, taglen, tests[x].tag, tests[x].taglen, "CCM encrypt tag", x)) {
+         if (ltc_compare_testvector(tag, taglen, tests[x].tag, tests[x].taglen, "CCM encrypt tag", x)) {
             return CRYPT_FAIL_TESTVECTOR;
          }
 
@@ -207,7 +207,7 @@ int ccm_test(void)
          }
 
 
-         if (compare_testvector(buf2, tests[x].ptlen, tests[x].pt, tests[x].ptlen, "CCM decrypt data", x)) {
+         if (ltc_compare_testvector(buf2, tests[x].ptlen, tests[x].pt, tests[x].ptlen, "CCM decrypt data", x)) {
             return CRYPT_FAIL_TESTVECTOR;
          }
          if (y == 0) {
@@ -225,17 +225,17 @@ int ccm_test(void)
                            tag3, &taglen, 1   ) != CRYPT_ERROR) {
                return CRYPT_FAIL_TESTVECTOR;
             }
-            if (compare_testvector(buf2, tests[x].ptlen, zero, tests[x].ptlen, "CCM decrypt wrong tag", x)) {
+            if (ltc_compare_testvector(buf2, tests[x].ptlen, zero, tests[x].ptlen, "CCM decrypt wrong tag", x)) {
                return CRYPT_FAIL_TESTVECTOR;
             }
          } else {
-            if (compare_testvector(tag2, taglen, tests[x].tag, tests[x].taglen, "CCM decrypt tag", x)) {
+            if (ltc_compare_testvector(tag2, taglen, tests[x].tag, tests[x].taglen, "CCM decrypt tag", x)) {
                return CRYPT_FAIL_TESTVECTOR;
             }
          }
 
          if (y == 0) {
-            cipher_descriptor[idx].done(&skey);
+            ecb_done(&skey);
          }
       }
    }

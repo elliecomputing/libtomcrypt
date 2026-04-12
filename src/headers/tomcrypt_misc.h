@@ -102,15 +102,6 @@ int crypt_list_all_constants(char *names_list, unsigned int *names_list_size);
 int crypt_get_size(const char* namein, unsigned int *sizeout);
 int crypt_list_all_sizes(char *names_list, unsigned int *names_list_size);
 
-#ifdef LTM_DESC
-LTC_DEPRECATED(crypt_mp_init) void init_LTM(void);
-#endif
-#ifdef TFM_DESC
-LTC_DEPRECATED(crypt_mp_init) void init_TFM(void);
-#endif
-#ifdef GMP_DESC
-LTC_DEPRECATED(crypt_mp_init) void init_GMP(void);
-#endif
 int crypt_mp_init(const char* mpi);
 
 #ifdef LTC_ADLER32
@@ -210,4 +201,5 @@ int ssh_encode_sequence_multi(unsigned char *out, unsigned long *outlen, ...) LT
 int ssh_decode_sequence_multi(const unsigned char *in, unsigned long *inlen, ...) LTC_NULL_TERMINATED;
 #endif /* LTC_SSH */
 
+LTC_DEPRECATED(nothing. API will be internal)
 int compare_testvector(const void* is, const unsigned long is_len, const void* should, const unsigned long should_len, const char* what, int which);

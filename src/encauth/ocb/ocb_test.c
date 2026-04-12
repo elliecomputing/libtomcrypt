@@ -167,15 +167,15 @@ int ocb_test(void)
        }
     }
 
-    for (x = 0; x < (int)(sizeof(tests)/sizeof(tests[0])); x++) {
+    for (x = 0; x < (int)LTC_ARRAY_SIZE(tests); x++) {
         len = sizeof(outtag);
         if ((err = ocb_encrypt_authenticate_memory(idx, tests[x].key, 16,
              tests[x].nonce, tests[x].pt, tests[x].ptlen, outct, outtag, &len)) != CRYPT_OK) {
            return err;
         }
 
-        if (compare_testvector(outtag, len, tests[x].tag, sizeof(tests[x].tag), "OCB Tag", x) ||
-              compare_testvector(outct, tests[x].ptlen, tests[x].ct, tests[x].ptlen, "OCB CT", x)) {
+        if (ltc_compare_testvector(outtag, len, tests[x].tag, sizeof(tests[x].tag), "OCB Tag", x) ||
+              ltc_compare_testvector(outct, tests[x].ptlen, tests[x].ct, tests[x].ptlen, "OCB CT", x)) {
            return CRYPT_FAIL_TESTVECTOR;
         }
 
@@ -183,7 +183,7 @@ int ocb_test(void)
              outct, tests[x].tag, len, &res)) != CRYPT_OK) {
            return err;
         }
-        if ((res != 1) || compare_testvector(outct, tests[x].ptlen, tests[x].pt, tests[x].ptlen, "OCB", x)) {
+        if ((res != 1) || ltc_compare_testvector(outct, tests[x].ptlen, tests[x].pt, tests[x].ptlen, "OCB", x)) {
 #ifdef LTC_TEST_DBG
            printf("\n\nOCB: Failure-decrypt - res = %d\n", res);
 #endif

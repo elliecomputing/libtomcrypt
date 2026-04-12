@@ -80,7 +80,7 @@ int pelican_test(void)
    unsigned char out[16];
    pelican_state pel;
 
-   for (x = 0; x < (int)(sizeof(tests)/sizeof(tests[0])); x++) {
+   for (x = 0; x < (int)LTC_ARRAY_SIZE(tests); x++) {
        if ((err = pelican_init(&pel, tests[x].K, tests[x].keylen)) != CRYPT_OK) {
           return err;
        }
@@ -91,7 +91,7 @@ int pelican_test(void)
           return err;
        }
 
-       if (compare_testvector(out, 16, tests[x].T, 16, "PELICAN", x)) {
+       if (ltc_compare_testvector(out, 16, tests[x].T, 16, "PELICAN", x)) {
            return CRYPT_FAIL_TESTVECTOR;
        }
    }
